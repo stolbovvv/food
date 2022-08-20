@@ -174,4 +174,76 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('scroll', showModalByScroll);
+
+  // script: calsses
+  class MenuCard {
+    constructor({ src, alt, title, descr, price, parentSelector, classes = [] }) {
+      this.src = src;
+      this.alt = alt;
+      this.title = title;
+      this.descr = descr;
+      this.price = price;
+      this.classes = classes;
+      this.parent = document.querySelector(parentSelector);
+      this.transfer = 65;
+      this.changeToRUB();
+    }
+
+    changeToRUB() {
+      this.price *= this.transfer;
+    }
+
+    render() {
+      const parent = this.parent;
+      const classNames = this.classes;
+      const card = document.createElement('div');
+      const price = document.createElement('div');
+
+      if (!classNames.includes('menu__item')) classNames.push('menu__item');
+
+      card.classList.add(...classNames);
+
+      card.insertAdjacentHTML('beforeend', `<img src=${this.src} alt=${this.alt} />`);
+      card.insertAdjacentHTML('beforeend', `<h3 class="menu__item-subtitle">${this.title}</h3>`);
+      card.insertAdjacentHTML('beforeend', `<p class="menu__item-descr">${this.descr}</p>`);
+      card.insertAdjacentHTML('beforeend', `<div class="menu__item-divider"></div>`);
+
+      price.classList.add('menu__item-price');
+
+      price.insertAdjacentHTML('beforeend', `<div class="menu__item-cost">Цена:</div>`);
+      price.insertAdjacentHTML('beforeend', `<div class="menu__item-total"><span>${this.price}</span> руб/день</div>`);
+
+      card.append(price);
+      parent.append(card);
+    }
+  }
+
+  new MenuCard({
+    src: './images/tabs/vegy.jpg',
+    alt: 'vegy',
+    title: 'Меню "Фитнес"',
+    price: 9,
+    parentSelector: '.menu .container',
+    classes: ['menu__item', 'menu__item_new'],
+    descr: `Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!`,
+  }).render();
+
+  new MenuCard({
+    src: './images/tabs/elite.jpg',
+    alt: 'elite',
+    title: 'Меню “Премиум”',
+    price: 21,
+    parentSelector: '.menu .container',
+    descr: `В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!`,
+  }).render();
+
+  new MenuCard({
+    src: './images/tabs/post.jpg',
+    alt: 'post',
+    title: 'Меню "Постное"',
+    price: 14,
+    parentSelector: '.menu .container',
+    classes: ['menu__item'],
+    descr: `Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.`,
+  }).render();
 });
