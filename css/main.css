@@ -388,7 +388,7 @@ a {
   display: block;
   width: 16px;
   height: 16px;
-  background: url(../icons/switch.svg) center center/cover no-repeat;
+  background: url(../images/icons/switch.svg) center center/cover no-repeat;
 }
 .calculating__choose {
   position: relative;
@@ -736,3 +736,35 @@ a {
   width: 280px;
   margin: 0 auto;
 }
+
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  0% {
+    opacity: 0.1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.--show {
+  display: block;
+}
+
+.--hide {
+  display: none;
+}
+
+.--anim-fade {
+  -webkit-animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+          animation: fade-in 1.2s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+}
+
