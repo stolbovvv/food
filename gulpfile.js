@@ -21,7 +21,6 @@ function collectCSS() {
   return gulp
     .src([`./${_sourceName}/css/**/*.css`, `!./${_sourceName}/css/**/*.min.css`])
     .pipe(autoprefixer({ grid: 'autoplace', cascade: true }))
-    .pipe(purgeCSS({ content: [`./${_sourceName}/**/*.html`] }))
     .pipe(gulp.dest(`./${_tempName}/css/`))
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename({ suffix: '.min' }))
@@ -99,3 +98,4 @@ exports.archive = gulp.series(cleanTemp, cleanBuild, collectJS, collectCSS, coll
 
 // Default task
 exports.default = gulp.series(collectJS, collectCSS, runServer);
+
