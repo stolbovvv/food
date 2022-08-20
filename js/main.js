@@ -36,8 +36,8 @@ window.addEventListener('DOMContentLoaded', function () {
   showTabsContent();
 
   if (tabsWrapper) {
-    tabsWrapper.addEventListener('click', function (event) {
-      var target = event.target;
+    tabsWrapper.addEventListener('click', function (e) {
+      var target = e.target;
 
       if (target && target.classList.contains('tabheader__item')) {
         tabsItems.forEach(function (item, i) {
@@ -110,5 +110,60 @@ window.addEventListener('DOMContentLoaded', function () {
     timeInterval = setInterval(updeteClock, 1000);
   }
 
-  setClock('.timer', deadline);
+  setClock('.timer', deadline); // script: modal
+
+  var modalTrigger = document.querySelectorAll('[data-modal-trigger]');
+  var modalBody = document.querySelector('.modal');
+  var modalDialog = modalBody.querySelector('.modal__dialog');
+  var modalTimerID;
+
+  function openModal() {
+    var widthBefore;
+    var widthAfter;
+    widthBefore = document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    widthAfter = document.documentElement.clientWidth;
+    if (widthBefore !== widthAfter) document.body.style.paddingRight = Math.abs(widthAfter - widthBefore) + 'px';
+    modalBody.classList.add('--show', '--anim-fade');
+    modalBody.classList.remove('--hide');
+    modalDialog.classList.add('--anim-slide-bottom');
+    clearTimeout(modalTimerID);
+  }
+
+  function closeModal() {
+    modalBody.classList.add('--hide');
+    modalBody.classList.remove('--show', '--anim-fade');
+    modalDialog.classList.remove('--anim-slide-bottom');
+    if (document.body.style.overflow) document.body.style.overflow = '';
+    if (document.body.style.paddingRight) document.body.style.paddingRight = '';
+  }
+
+  modalTrigger.forEach(function (trigger) {
+    trigger.addEventListener('click', function (e) {
+      var target = e.target;
+      if (target && trigger.dataset.modalTrigger === 'open') openModal();
+      if (target && trigger.dataset.modalTrigger === 'close') closeModal();
+    });
+  });
+  modalBody.addEventListener('click', function (e) {
+    var target = e.target;
+    if (target && target === modalBody) closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Escape' && modalBody.classList.contains('--show')) closeModal();
+  });
+  modalTimerID = setTimeout(openModal, 10000);
+
+  function showModalByScroll() {
+    var scrollY = window.scrollY;
+    var clientHeight = document.documentElement.clientHeight;
+    var scrollHeight = document.documentElement.scrollHeight;
+
+    if (scrollY + clientHeight >= scrollHeight - 1) {
+      openModal();
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
+
+  window.addEventListener('scroll', showModalByScroll);
 });
