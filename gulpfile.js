@@ -10,33 +10,35 @@ const deleteAsync = require('del');
 const browserSync = require('browser-sync').create();
 const autoprefixer = require('gulp-autoprefixer');
 
-// Cariables setting
+// Variables setting
 const _rootName = path.basename(__dirname);
 const _tempName = '.temp';
 const _buildName = 'dist';
 const _sourceName = 'app';
+const _modeIsDev = !process.argv.includes('--production');
+const _modeIsProd = process.argv.includes('--production');
 
 // Processing Bundle CSS
 function collectCSS() {
   return gulp
-    .src([`./${_sourceName}/css/**/*.css`, `!./${_sourceName}/css/**/*.min.css`])
+    .src([`./${_sourceName}/css/**/*.css`, `!./${_sourceName}/css/**/*.min.css`], { sourcemaps: _modeIsDev })
     .pipe(autoprefixer({ grid: 'autoplace', cascade: true }))
     .pipe(gulp.dest(`./${_tempName}/css/`))
     .pipe(cleanCSS({ compatibility: 'ie8' }))
     .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(`./${_sourceName}/css/`))
+    .pipe(gulp.dest(`./${_sourceName}/css/`, { sourcemaps: './' }))
     .pipe(browserSync.stream());
 }
 
 // Processing Bundle JS
 function collectJS() {
   return gulp
-    .src([`./${_sourceName}/js/**/*.js`, `!./${_sourceName}/js/**/*.min.js`])
+    .src([`./${_sourceName}/js/**/*.js`, `!./${_sourceName}/js/**/*.min.js`], { sourcemaps: _modeIsDev })
     .pipe(babelJS({ presets: ['@babel/env'] }))
     .pipe(gulp.dest(`./${_tempName}/js/`))
     .pipe(terserJS())
     .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(`./${_sourceName}/js/`))
+    .pipe(gulp.dest(`./${_sourceName}/js/`, { sourcemaps: './' }))
     .pipe(browserSync.stream());
 }
 
@@ -53,6 +55,7 @@ function collectBuild() {
         `./${_sourceName}/site.webmanifest`,
         `./${_sourceName}/favicon.ico`,
         `./${_sourceName}/{favicon*,android*,apple*}.png`,
+        `./${_sourceName}/server.php`,
       ],
       { base: `./${_sourceName}/` },
     )
@@ -72,9 +75,10 @@ function collectArchive() {
 // Starting a server with file watching
 function runServer() {
   browserSync.init({
-    server: {
-      baseDir: `./${_sourceName}/`,
-    },
+    // server: {
+    //   baseDir: `./${_sourceName}/`,
+    // },
+    proxy: 'http://food.com/',
     port: 1234,
     open: true,
     online: true,
@@ -98,4 +102,3 @@ exports.archive = gulp.series(cleanTemp, cleanBuild, collectJS, collectCSS, coll
 
 // Default task
 exports.default = gulp.series(collectJS, collectCSS, runServer);
-
