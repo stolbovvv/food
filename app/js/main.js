@@ -300,12 +300,12 @@ window.addEventListener('DOMContentLoaded', () => {
 
       const xhr = new XMLHttpRequest();
 
-      xhr.open('POST', './server.php');
+      xhr.open('POST', 'https://jsonplaceholder.typicode.com/users');
       xhr.setRequestHeader('Content-type', 'aplication/json');
       xhr.send(JSON.stringify(jsonData));
 
       xhr.addEventListener('load', () => {
-        if (xhr.status === 200) {
+        if (xhr.status === 200 || xhr.status === 201) {
           console.log(xhr.response);
           showThanksModal(message.success);
         } else {
