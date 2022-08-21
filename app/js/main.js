@@ -291,29 +291,32 @@ window.addEventListener('DOMContentLoaded', () => {
 
       form.insertAdjacentElement('afterend', statusMessage);
 
-      const jsonData = {};
       const formData = new FormData(form);
+      const jsonData = {};
 
       for (const [key, val] of formData) {
         jsonData[key] = val;
       }
 
-      const xhr = new XMLHttpRequest();
-
-      xhr.open('POST', 'https://jsonplaceholder.typicode.com/users');
-      xhr.setRequestHeader('Content-type', 'aplication/json');
-      xhr.send(JSON.stringify(jsonData));
-
-      xhr.addEventListener('load', () => {
-        if (xhr.status === 200 || xhr.status === 201) {
-          console.log(xhr.response);
+      fetch('./server1.php', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify(jsonData),
+      })
+        .then((data) => data.text())
+        .then((data) => {
+          console.log(data);
           showThanksModal(message.success);
-        } else {
+        })
+        .catch(() => {
           showThanksModal(message.failure);
-        }
-        form.reset();
-        statusMessage.remove();
-      });
+        })
+        .finally(() => {
+          form.reset();
+          statusMessage.remove();
+        });
     });
   }
 
