@@ -166,22 +166,6 @@ window.addEventListener('DOMContentLoaded', function () {
     if (document.body.style.paddingRight) document.body.style.paddingRight = '';
   }
 
-  modalTrigger.forEach(function (trigger) {
-    trigger.addEventListener('click', function (e) {
-      var target = e.target;
-      if (target && trigger.dataset.modalTrigger === 'open') openModal();
-      if (target && trigger.dataset.modalTrigger === 'close') closeModal();
-    });
-  });
-  modalBody.addEventListener('click', function (e) {
-    var target = e.target;
-    if (target && target === modalBody) closeModal();
-  });
-  document.addEventListener('keydown', function (e) {
-    if (e.code === 'Escape' && modalBody.classList.contains('--show')) closeModal();
-  });
-  modalTimerID = setTimeout(openModal, 10000);
-
   function showModalByScroll() {
     var scrollY = window.scrollY;
     var clientHeight = document.documentElement.clientHeight;
@@ -193,7 +177,42 @@ window.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  window.addEventListener('scroll', showModalByScroll); // script: calsses
+  function showThanksModal(message) {
+    var thanksModal = document.createElement('div');
+    var contentModal = document.createElement('div');
+    modalDialog.classList.add('--hide');
+    thanksModal.classList.add('modal__dialog', '--anim-slide-bottom');
+    contentModal.classList.add('modal__content');
+    thanksModal.insertAdjacentElement('beforeend', contentModal);
+    contentModal.insertAdjacentHTML('beforeend', '<div class="modal__close" data-modal-trigger="close">&times;</div>');
+    contentModal.insertAdjacentHTML('beforeend', "<div class=\"modal__title\">".concat(message, "</div>"));
+    modalBody.append(thanksModal);
+    openModal();
+    setTimeout(function () {
+      thanksModal.remove();
+      modalDialog.classList.add('--show');
+      modalDialog.classList.remove('--hide');
+      closeModal();
+    }, 4000);
+  }
+
+  window.addEventListener('scroll', showModalByScroll);
+  modalTimerID = setTimeout(openModal, 50000);
+  modalTrigger.forEach(function (trigger) {
+    trigger.addEventListener('click', function (e) {
+      var target = e.target;
+      if (target && trigger.dataset.modalTrigger === 'open') openModal();
+      if (target && trigger.dataset.modalTrigger === 'close') closeModal();
+    });
+  });
+  modalBody.addEventListener('click', function (e) {
+    var target = e.target;
+    if (target && target === modalBody) closeModal();
+    if (target && target.dataset.modalTrigger === 'close') closeModal();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Escape' && modalBody.classList.contains('--show')) closeModal();
+  }); // script: calsses
 
   var MenuCard = /*#__PURE__*/function () {
     function MenuCard(_ref) {
@@ -281,7 +300,7 @@ window.addEventListener('DOMContentLoaded', function () {
 
   var forms = document.querySelectorAll('form');
   var message = {
-    loading: 'Загрузка',
+    loading: 'images/icons/spinner.svg',
     success: 'Спасибо! Мы скорос в вами свяжемся',
     failure: 'Что-то пошло не так...'
   };
@@ -289,10 +308,11 @@ window.addEventListener('DOMContentLoaded', function () {
   function postData(form) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
-      var statusMessage = document.createElement('div');
-      statusMessage.classList.add('status');
-      statusMessage.textContent = message.loading;
-      form.append(statusMessage);
+      var statusMessage = document.createElement('img');
+      statusMessage.src = message.loading;
+      statusMessage.style.display = 'block';
+      statusMessage.style.margin = '0 auto';
+      form.insertAdjacentElement('afterend', statusMessage);
       var jsonData = {};
       var formData = new FormData(form);
 
@@ -320,14 +340,13 @@ window.addEventListener('DOMContentLoaded', function () {
       xhr.addEventListener('load', function () {
         if (xhr.status === 200) {
           console.log(xhr.response);
-          statusMessage.textContent = message.success;
-          form.reset();
-          setTimeout(function () {
-            return statusMessage.remove();
-          }, 2000);
+          showThanksModal(message.success);
         } else {
-          statusMessage.textContent = message.failure;
+          showThanksModal(message.failure);
         }
+
+        form.reset();
+        statusMessage.remove();
       });
     });
   }
