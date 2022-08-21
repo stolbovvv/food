@@ -1,5 +1,15 @@
 "use strict";
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -267,5 +277,62 @@ window.addEventListener('DOMContentLoaded', function () {
     parentSelector: '.menu .container',
     classes: ['menu__item'],
     descr: "\u041C\u0435\u043D\u044E \u201C\u041F\u043E\u0441\u0442\u043D\u043E\u0435\u201D - \u044D\u0442\u043E \u0442\u0449\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u043F\u043E\u0434\u0431\u043E\u0440 \u0438\u043D\u0433\u0440\u0435\u0434\u0438\u0435\u043D\u0442\u043E\u0432: \u043F\u043E\u043B\u043D\u043E\u0435 \u043E\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0438\u0435 \u043F\u0440\u043E\u0434\u0443\u043A\u0442\u043E\u0432 \u0436\u0438\u0432\u043E\u0442\u043D\u043E\u0433\u043E \u043F\u0440\u043E\u0438\u0441\u0445\u043E\u0436\u0434\u0435\u043D\u0438\u044F, \u043C\u043E\u043B\u043E\u043A\u043E \u0438\u0437 \u043C\u0438\u043D\u0434\u0430\u043B\u044F, \u043E\u0432\u0441\u0430, \u043A\u043E\u043A\u043E\u0441\u0430 \u0438\u043B\u0438 \u0433\u0440\u0435\u0447\u043A\u0438, \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u043E\u0435 \u043A\u043E\u043B\u0438\u0447\u0435\u0441\u0442\u0432\u043E \u0431\u0435\u043B\u043A\u043E\u0432 \u0437\u0430 \u0441\u0447\u0435\u0442 \u0442\u043E\u0444\u0443 \u0438 \u0438\u043C\u043F\u043E\u0440\u0442\u043D\u044B\u0445 \u0432\u0435\u0433\u0435\u0442\u0430\u0440\u0438\u0430\u043D\u0441\u043A\u0438\u0445 \u0441\u0442\u0435\u0439\u043A\u043E\u0432."
-  }).render();
+  }).render(); // script: forms
+
+  var forms = document.querySelectorAll('form');
+  var message = {
+    loading: 'Загрузка',
+    success: 'Спасибо! Мы скорос в вами свяжемся',
+    failure: 'Что-то пошло не так...'
+  };
+
+  function postData(form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var statusMessage = document.createElement('div');
+      statusMessage.classList.add('status');
+      statusMessage.textContent = message.loading;
+      form.append(statusMessage);
+      var jsonData = {};
+      var formData = new FormData(form);
+
+      var _iterator = _createForOfIteratorHelper(formData),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var _step$value = _slicedToArray(_step.value, 2),
+              key = _step$value[0],
+              val = _step$value[1];
+
+          jsonData[key] = val;
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', './server.php');
+      xhr.setRequestHeader('Content-type', 'aplication/json');
+      xhr.send(JSON.stringify(jsonData));
+      xhr.addEventListener('load', function () {
+        if (xhr.status === 200) {
+          console.log(xhr.response);
+          statusMessage.textContent = message.success;
+          form.reset();
+          setTimeout(function () {
+            return statusMessage.remove();
+          }, 2000);
+        } else {
+          statusMessage.textContent = message.failure;
+        }
+      });
+    });
+  }
+
+  forms.forEach(function (form) {
+    return postData(form);
+  });
 });
