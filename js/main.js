@@ -313,8 +313,8 @@ window.addEventListener('DOMContentLoaded', function () {
       statusMessage.style.display = 'block';
       statusMessage.style.margin = '0 auto';
       form.insertAdjacentElement('afterend', statusMessage);
-      var jsonData = {};
       var formData = new FormData(form);
+      var jsonData = {};
 
       var _iterator = _createForOfIteratorHelper(formData),
           _step;
@@ -333,18 +333,20 @@ window.addEventListener('DOMContentLoaded', function () {
         _iterator.f();
       }
 
-      var xhr = new XMLHttpRequest();
-      xhr.open('POST', 'https://jsonplaceholder.typicode.com/users');
-      xhr.setRequestHeader('Content-type', 'aplication/json');
-      xhr.send(JSON.stringify(jsonData));
-      xhr.addEventListener('load', function () {
-        if (xhr.status === 200 || xhr.status === 201) {
-          console.log(xhr.response);
-          showThanksModal(message.success);
-        } else {
-          showThanksModal(message.failure);
-        }
-
+      fetch('./server1.php', {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=utf-8'
+        },
+        body: JSON.stringify(jsonData)
+      }).then(function (data) {
+        return data.text();
+      }).then(function (data) {
+        console.log(data);
+        showThanksModal(message.success);
+      }).catch(function () {
+        showThanksModal(message.failure);
+      }).finally(function () {
         form.reset();
         statusMessage.remove();
       });
