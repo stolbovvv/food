@@ -141,6 +141,45 @@ window.addEventListener('DOMContentLoaded', () => {
     if (document.body.style.paddingRight) document.body.style.paddingRight = '';
   }
 
+  function showModalByScroll() {
+    const scrollY = window.scrollY;
+    const clientHeight = document.documentElement.clientHeight;
+    const scrollHeight = document.documentElement.scrollHeight;
+
+    if (scrollY + clientHeight >= scrollHeight - 1) {
+      openModal();
+      window.removeEventListener('scroll', showModalByScroll);
+    }
+  }
+
+  function showThanksModal(message) {
+    const thanksModal = document.createElement('div');
+    const contentModal = document.createElement('div');
+
+    modalDialog.classList.add('--hide');
+    thanksModal.classList.add('modal__dialog', '--anim-slide-bottom');
+    contentModal.classList.add('modal__content');
+
+    thanksModal.insertAdjacentElement('beforeend', contentModal);
+    contentModal.insertAdjacentHTML('beforeend', '<div class="modal__close" data-modal-trigger="close">&times;</div>');
+    contentModal.insertAdjacentHTML('beforeend', `<div class="modal__title">${message}</div>`);
+
+    modalBody.append(thanksModal);
+
+    openModal();
+
+    setTimeout(() => {
+      thanksModal.remove();
+      modalDialog.classList.add('--show');
+      modalDialog.classList.remove('--hide');
+      closeModal();
+    }, 4000);
+  }
+
+  window.addEventListener('scroll', showModalByScroll);
+
+  modalTimerID = setTimeout(openModal, 50000);
+
   modalTrigger.forEach((trigger) => {
     trigger.addEventListener('click', (e) => {
       const target = e.target;
@@ -154,26 +193,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const target = e.target;
 
     if (target && target === modalBody) closeModal();
+    if (target && target.dataset.modalTrigger === 'close') closeModal();
   });
 
   document.addEventListener('keydown', (e) => {
     if (e.code === 'Escape' && modalBody.classList.contains('--show')) closeModal();
   });
-
-  modalTimerID = setTimeout(openModal, 10000);
-
-  function showModalByScroll() {
-    const scrollY = window.scrollY;
-    const clientHeight = document.documentElement.clientHeight;
-    const scrollHeight = document.documentElement.scrollHeight;
-
-    if (scrollY + clientHeight >= scrollHeight - 1) {
-      openModal();
-      window.removeEventListener('scroll', showModalByScroll);
-    }
-  }
-
-  window.addEventListener('scroll', showModalByScroll);
 
   // script: calsses
   class MenuCard {
@@ -250,7 +275,7 @@ window.addEventListener('DOMContentLoaded', () => {
   // script: forms
   const forms = document.querySelectorAll('form');
   const message = {
-    loading: 'Загрузка',
+    loading: 'images/icons/spinner.svg',
     success: 'Спасибо! Мы скорос в вами свяжемся',
     failure: 'Что-то пошло не так...',
   };
@@ -259,12 +284,12 @@ window.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', (e) => {
       e.preventDefault();
 
-      const statusMessage = document.createElement('div');
+      const statusMessage = document.createElement('img');
+      statusMessage.src = message.loading;
+      statusMessage.style.display = 'block';
+      statusMessage.style.margin = '0 auto';
 
-      statusMessage.classList.add('status');
-      statusMessage.textContent = message.loading;
-
-      form.append(statusMessage);
+      form.insertAdjacentElement('afterend', statusMessage);
 
       const jsonData = {};
       const formData = new FormData(form);
@@ -282,12 +307,12 @@ window.addEventListener('DOMContentLoaded', () => {
       xhr.addEventListener('load', () => {
         if (xhr.status === 200) {
           console.log(xhr.response);
-          statusMessage.textContent = message.success;
-          form.reset();
-          setTimeout(() => statusMessage.remove(), 2000);
+          showThanksModal(message.success);
         } else {
-          statusMessage.textContent = message.failure;
+          showThanksModal(message.failure);
         }
+        form.reset();
+        statusMessage.remove();
       });
     });
   }
