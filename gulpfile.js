@@ -75,7 +75,10 @@ function collectArchive() {
 // Starting a server with file watching
 function runServer() {
   browserSync.init({
-    proxy: 'food.develop',
+    // proxy: 'food.develop',
+    server: {
+      baseDir: `./${_sourceName}/`,
+    },
     port: 1234,
     open: true,
     online: true,
