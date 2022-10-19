@@ -520,17 +520,4 @@ window.addEventListener('DOMContentLoaded', () => {
   getDinamicInformation('#height');
   getDinamicInformation('#weight');
   getDinamicInformation('#age');
-
-  const promisify = (item, delay) => new Promise((resolve) => setTimeout(() => resolve(item), delay));
-
-  const a = () => promisify('a', 100);
-  const b = () => promisify('b', 5000);
-  const c = () => promisify('c', 3000);
-
-  function one() {
-    const promises = [a(), b(), c()];
-    Promise.all(promises).then((values) => console.log(values));
-  }
-
-  one();
 });
