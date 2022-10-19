@@ -1,10 +1,8 @@
 const path = require('path');
 const gulp = require('gulp');
 const rename = require('gulp-rename');
+const webpack = require('webpack-stream');
 const gulpZIP = require('gulp-zip');
-const babelJS = require('gulp-babel');
-const terserJS = require('gulp-terser');
-const purgeCSS = require('gulp-purgecss');
 const cleanCSS = require('gulp-clean-css');
 const deleteAsync = require('del');
 const browserSync = require('browser-sync').create();
@@ -31,12 +29,29 @@ function collectCSS() {
 }
 
 // Processing Bundle JS
-function collectJS() {
+async function collectJS() {
   return gulp
-    .src([`./${_sourceName}/js/**/*.js`, `!./${_sourceName}/js/**/*.min.js`], { sourcemaps: _modeIsDev })
-    .pipe(babelJS({ presets: ['@babel/env'] }))
+    .src(`./${_sourceName}/js/main.js`, { sourcemaps: _modeIsDev })
+    .pipe(
+      webpack({
+        mode: _modeIsDev ? 'development' : 'production',
+        module: {
+          rules: [
+            {
+              test: /\.m?js$/,
+              exclude: /(node_modules|bower_components)/,
+              use: {
+                loader: 'babel-loader',
+                options: {
+                  presets: ['@babel/preset-env'],
+                },
+              },
+            },
+          ],
+        },
+      }),
+    )
     .pipe(gulp.dest(`./${_tempName}/js/`))
-    .pipe(terserJS())
     .pipe(rename({ suffix: '.min' }))
     .pipe(gulp.dest(`./${_sourceName}/js/`, { sourcemaps: './' }))
     .pipe(browserSync.stream());
@@ -86,7 +101,7 @@ function runServer() {
   });
 
   gulp.watch([`./${_sourceName}/**/*.html`]).on('change', browserSync.reload);
-  gulp.watch([`./${_sourceName}/js/**/*.js`, `!./${_sourceName}/js/**/*.min.js`], collectJS);
+  gulp.watch([`./${_sourceName}/js/main.js`, `!./${_sourceName}/js/**/*.min.js`], collectJS);
   gulp.watch([`./${_sourceName}/css/**/*.css`, `!./${_sourceName}/css/**/*.min.css`], collectCSS);
 }
 
