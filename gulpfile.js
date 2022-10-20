@@ -31,10 +31,14 @@ function collectCSS() {
 // Processing Bundle JS
 async function collectJS() {
   return gulp
-    .src(`./${_sourceName}/js/main.js`, { sourcemaps: _modeIsDev })
+    .src(`./${_sourceName}/js/main.js`)
     .pipe(
       webpack({
         mode: _modeIsDev ? 'development' : 'production',
+        devtool: 'source-map',
+        output: {
+          filename: 'common.js',
+        },
         module: {
           rules: [
             {
@@ -51,9 +55,7 @@ async function collectJS() {
         },
       }),
     )
-    .pipe(gulp.dest(`./${_tempName}/js/`))
-    .pipe(rename({ suffix: '.min' }))
-    .pipe(gulp.dest(`./${_sourceName}/js/`, { sourcemaps: './' }))
+    .pipe(gulp.dest(`./${_sourceName}/js/`))
     .pipe(browserSync.stream());
 }
 
@@ -101,7 +103,7 @@ function runServer() {
   });
 
   gulp.watch([`./${_sourceName}/**/*.html`]).on('change', browserSync.reload);
-  gulp.watch([`./${_sourceName}/js/main.js`, `!./${_sourceName}/js/**/*.min.js`], collectJS);
+  gulp.watch([`./${_sourceName}/js/**/*.js`, `!./${_sourceName}/js/**/common.js`], collectJS);
   gulp.watch([`./${_sourceName}/css/**/*.css`, `!./${_sourceName}/css/**/*.min.css`], collectCSS);
 }
 
